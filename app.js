@@ -184,13 +184,19 @@
     return '';
   }
 
-  // ---- 추천·비추천 (누를 때마다 +1, 이 브라우저에만 저장) ----
+  // ---- 추천·비추천 (추천 기본값 = 그곳을 소개한 학생 수, 누를 때마다 +1, 누른 횟수는 이 브라우저에만 저장) ----
   const VOTE_KEY = 'knut-guide-votes';
-  let votes = {};
+  let clicks = {};
   try {
-    votes = JSON.parse(localStorage.getItem(VOTE_KEY)) || {};
+    clicks = JSON.parse(localStorage.getItem(VOTE_KEY)) || {};
   } catch (e) {}
-  const voteOf = (name) => votes[name] || { up: 0, down: 0 };
+
+  const BASE = Object.fromEntries(places.map((p) => [p.name, { up: p.rec, down: 0 }]));
+  const voteOf = (name) => {
+    const b = BASE[name] || { up: 0, down: 0 };
+    const c = clicks[name] || {};
+    return { up: b.up + (c.up || 0), down: b.down + (c.down || 0) };
+  };
 
   function voteHTML(name) {
     const v = voteOf(name);
@@ -202,12 +208,13 @@
 
   function vote(btn) {
     const name = btn.closest('.votes').dataset.place;
-    const v = (votes[name] = voteOf(name));
-    v[btn.dataset.kind]++;
+    const kind = btn.dataset.kind;
+    const c = (clicks[name] = clicks[name] || { up: 0, down: 0 });
+    c[kind] = (c[kind] || 0) + 1;
     try {
-      localStorage.setItem(VOTE_KEY, JSON.stringify(votes));
+      localStorage.setItem(VOTE_KEY, JSON.stringify(clicks));
     } catch (e) {}
-    btn.querySelector('b').textContent = v[btn.dataset.kind];
+    btn.querySelector('b').textContent = voteOf(name)[kind];
     btn.classList.remove('bump');
     void btn.offsetWidth; // 연속으로 눌러도 애니메이션이 다시 재생되게
     btn.classList.add('bump');
@@ -220,7 +227,7 @@
     $('stats').innerHTML = [
       [total, '곳·꿀팁'],
       [food, '맛집·카페'],
-      [recs, '건의 학생 소개'],
+      [recs, '건의 추천'],
     ]
       .map(([n, label]) => `<li><strong>${n}</strong><span>${label}</span></li>`)
       .join('');
@@ -264,7 +271,6 @@
     return `<article class="card">
       <div class="card-top">
         <span class="badge" data-cat="${esc(p.cat)}">${ICON[p.cat] || ''} ${esc(p.cat)}</span>
-        ${p.rec > 1 ? `<span class="rec${p.rec >= 3 ? ' hot' : ''}" title="이 장소를 적은 학생 수">⭐ 학생 ${p.rec}명 소개</span>` : ''}
       </div>
       <h2>${hl(p.name)}</h2>
       ${facts.length ? `<dl class="facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${hl(v)}</dd></div>`).join('')}</dl>` : ''}
@@ -298,8 +304,7 @@
       const byName = (a, b) => a.p.name.localeCompare(b.p.name, 'ko');
       main = places.map((p) => ({ p }));
       const net = (p) => voteOf(p.name).up - voteOf(p.name).down;
-      if (state.sort === 'rec') main.sort((a, b) => b.p.rec - a.p.rec || byName(a, b));
-      else if (state.sort === 'votes') main.sort((a, b) => net(b.p) - net(a.p) || b.p.rec - a.p.rec || byName(a, b));
+      if (state.sort === 'rec') main.sort((a, b) => net(b.p) - net(a.p) || byName(a, b));
       else if (state.sort === 'date') main.sort((a, b) => (b.p.date || '').localeCompare(a.p.date || '') || b.p.rec - a.p.rec);
       else main.sort(byName);
     }

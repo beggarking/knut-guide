@@ -137,8 +137,6 @@ body {
 .badge[data-cat="생활꿀팁"] { background: var(--c-tip);    color: var(--c-tip-t); }
 .badge[data-cat="자유"]     { background: var(--c-free);   color: var(--c-free-t); }
 
-.rec { font-size: 13px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 10px; }
-.rec.hot { color: var(--hot); background: var(--hot-soft); font-weight: 600; }
 
 .facts { margin: 0 0 10px; display: grid; gap: 3px; font-size: 14px; }
 .facts div { display: flex; gap: 8px; }
@@ -188,14 +186,15 @@ mark { background: #ffe066; color: inherit; border-radius: 3px; padding: 0 1px; 
 /* 투표 */
 .votes { display: flex; gap: 6px; }
 .vote {
-  font: inherit; font-size: 13px;
-  color: var(--muted); background: transparent;
-  border: 1px solid var(--line); border-radius: 8px;
-  padding: 5px 9px; cursor: pointer;
+  font: inherit; font-size: 14px; font-weight: 600;
+  border: 1.5px solid transparent; border-radius: 999px;
+  padding: 6px 14px; cursor: pointer;
 }
-.vote b { display: inline-block; color: var(--text); font-weight: 600; }
-.vote[data-kind="up"]:hover { border-color: var(--accent); background: var(--accent-soft); }
-.vote[data-kind="down"]:hover { border-color: var(--hot); background: var(--hot-soft); }
+.vote b { display: inline-block; font-weight: 800; margin-left: 2px; }
+.vote[data-kind="up"] { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.vote[data-kind="down"] { color: var(--hot); background: var(--hot-soft); border-color: color-mix(in srgb, var(--hot) 35%, transparent); }
+.vote[data-kind="up"]:hover { border-color: var(--accent); }
+.vote[data-kind="down"]:hover { border-color: var(--hot); }
 .vote:active { transform: scale(0.95); }
 .vote.bump b { animation: bump 0.3s ease; }
 @keyframes bump { 50% { transform: scale(1.5); } }
