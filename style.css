@@ -193,11 +193,12 @@ mark { background: #ffe066; color: inherit; border-radius: 3px; padding: 0 1px; 
   border: 1px solid var(--line); border-radius: 8px;
   padding: 5px 9px; cursor: pointer;
 }
-.vote b { color: var(--text); font-weight: 600; }
-.vote:hover { border-color: var(--accent); }
-.vote[data-kind="up"][aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-.vote[data-kind="down"][aria-pressed="true"] { background: var(--hot-soft); border-color: var(--hot); color: var(--hot); }
-.vote[aria-pressed="true"] b { color: inherit; }
+.vote b { display: inline-block; color: var(--text); font-weight: 600; }
+.vote[data-kind="up"]:hover { border-color: var(--accent); background: var(--accent-soft); }
+.vote[data-kind="down"]:hover { border-color: var(--hot); background: var(--hot-soft); }
+.vote:active { transform: scale(0.95); }
+.vote.bump b { animation: bump 0.3s ease; }
+@keyframes bump { 50% { transform: scale(1.5); } }
 
 .footer { color: var(--muted); font-size: 13px; padding-top: 32px; padding-bottom: 40px; }
 .footer p { margin: 4px 0; }

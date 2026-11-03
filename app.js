@@ -184,82 +184,33 @@
     return '';
   }
 
-  // ---- 추천·비추천 투표 ----
-  // config.js에 Supabase 주소·키가 있으면 모두와 공유, 없으면 이 브라우저에만 저장
-  const CFG = window.VOTE_CONFIG || {};
-  const SHARED = Boolean(CFG.url && CFG.key);
-  const MY_KEY = 'knut-guide-my-votes';
-  let my = {};
+  // ---- 추천·비추천 (누를 때마다 +1, 이 브라우저에만 저장) ----
+  const VOTE_KEY = 'knut-guide-votes';
+  let votes = {};
   try {
-    my = JSON.parse(localStorage.getItem(MY_KEY)) || {};
+    votes = JSON.parse(localStorage.getItem(VOTE_KEY)) || {};
   } catch (e) {}
-  const votes = {};
-  const voteOf = (name) => votes[name] || (votes[name] = { up: 0, down: 0 });
-  const saveMy = () => {
-    try {
-      localStorage.setItem(MY_KEY, JSON.stringify(my));
-    } catch (e) {}
-  };
-
-  function api(path, opts = {}) {
-    return fetch(CFG.url.replace(/\/$/, '') + '/rest/v1/' + path, {
-      ...opts,
-      headers: { apikey: CFG.key, Authorization: 'Bearer ' + CFG.key, 'Content-Type': 'application/json' },
-    }).then((r) => {
-      if (!r.ok) throw new Error('투표 서버 응답 ' + r.status);
-      return r.json();
-    });
-  }
-
-  function loadVotes() {
-    if (!SHARED) {
-      Object.entries(my).forEach(([name, kind]) => (voteOf(name)[kind] = 1));
-      return Promise.resolve();
-    }
-    return api('votes?select=place,up,down')
-      .then((rows) => rows.forEach((r) => (votes[r.place] = { up: r.up, down: r.down })))
-      .catch((e) => console.warn(e));
-  }
+  const voteOf = (name) => votes[name] || { up: 0, down: 0 };
 
   function voteHTML(name) {
     const v = voteOf(name);
-    const mine = my[name];
     return (
-      `<button type="button" class="vote" data-kind="up" aria-pressed="${mine === 'up'}" title="추천">👍 추천 <b>${v.up}</b></button>` +
-      `<button type="button" class="vote" data-kind="down" aria-pressed="${mine === 'down'}" title="비추천">👎 비추천 <b>${v.down}</b></button>`
+      `<button type="button" class="vote" data-kind="up" title="추천">👍 추천 <b>${v.up}</b></button>` +
+      `<button type="button" class="vote" data-kind="down" title="비추천">👎 비추천 <b>${v.down}</b></button>`
     );
   }
-  function refreshVotes(name) {
-    document.querySelectorAll('.votes').forEach((el) => {
-      if (!name || el.dataset.place === name) el.innerHTML = voteHTML(el.dataset.place);
-    });
-  }
 
-  function vote(name, kind) {
-    const prev = my[name];
-    const next = prev === kind ? null : kind; // 같은 버튼을 다시 누르면 취소
-    const d = { up: (next === 'up') - (prev === 'up'), down: (next === 'down') - (prev === 'down') };
-    const apply = (sign, mineValue) => {
-      const v = voteOf(name);
-      v.up = Math.max(0, v.up + sign * d.up);
-      v.down = Math.max(0, v.down + sign * d.down);
-      if (mineValue) my[name] = mineValue;
-      else delete my[name];
-      saveMy();
-      refreshVotes(name);
-    };
-    apply(1, next);
-    if (!SHARED) return;
-    api('rpc/vote', { method: 'POST', body: JSON.stringify({ p_place: name, p_up: d.up, p_down: d.down }) })
-      .then((r) => {
-        votes[name] = { up: r.up, down: r.down };
-        refreshVotes(name);
-      })
-      .catch((e) => {
-        console.warn(e);
-        apply(-1, prev);
-        alert('투표를 저장하지 못했어요. 잠시 뒤 다시 눌러 주세요.');
-      });
+  function vote(btn) {
+    const name = btn.closest('.votes').dataset.place;
+    const v = (votes[name] = voteOf(name));
+    v[btn.dataset.kind]++;
+    try {
+      localStorage.setItem(VOTE_KEY, JSON.stringify(votes));
+    } catch (e) {}
+    btn.querySelector('b').textContent = v[btn.dataset.kind];
+    btn.classList.remove('bump');
+    void btn.offsetWidth; // 연속으로 눌러도 애니메이션이 다시 재생되게
+    btn.classList.add('bump');
   }
 
   function renderStats() {
@@ -410,14 +361,10 @@
   });
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.vote');
-    if (btn) vote(btn.closest('.votes').dataset.place, btn.dataset.kind);
+    if (btn) vote(btn);
   });
 
-  $('voteNote').textContent = SHARED
-    ? '👍 추천 / 👎 비추천은 방문자 투표예요. 한 곳에 한 번씩, 다시 누르면 취소돼요.'
-    : '👍 추천 / 👎 비추천은 지금 이 브라우저에만 저장돼요.';
   renderStats();
   renderQuick();
   setCat(decodeURIComponent(location.hash.slice(1)) || '전체');
-  loadVotes().then(() => (state.sort === 'votes' && !state.q.trim() ? render() : refreshVotes()));
 })();
