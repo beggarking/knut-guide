@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>교통대 생활 가이드</title>
+  <meta name="description" content="한국교통대학교 충주캠퍼스 학생들이 직접 정리한 맛집·카페·숨은 장소·생활 꿀팁 모음">
+  <meta property="og:title" content="교통대 생활 가이드">
+  <meta property="og:description" content="학생들이 직접 다녀와서 남긴 맛집·카페·숨은 장소·생활 꿀팁">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚉</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">한국교통대학교 충주캠퍼스 · 비공식 학생 가이드</p>
+      <h1>교통대 생활 가이드</h1>
+      <p class="lede">교통대에 처음 왔다면 여기부터 보세요. 학생들이 직접 다녀와서 남긴 맛집, 카페, 숨은 장소, 생활 꿀팁을 한곳에 모았어요.</p>
+      <ul class="stats" id="stats"></ul>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="wrap">
+      <div class="search-row">
+        <input id="q" type="search" placeholder="이름·메뉴·위치로 검색 (예: 짜장면, 프린터, 999번)" autocomplete="off" aria-label="검색">
+        <select id="sort" aria-label="정렬">
+          <option value="rec">추천 많은 순</option>
+          <option value="name">이름 순</option>
+          <option value="date">최근 확인 순</option>
+        </select>
+      </div>
+      <nav class="tabs" id="tabs" aria-label="분류"></nav>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <p class="count" id="count"></p>
+    <section class="grid" id="list"></section>
+    <p class="empty" id="empty" hidden>찾는 결과가 없어요. 다른 단어로 검색해 보세요.</p>
+  </main>
+
+  <footer class="wrap footer">
+    <p>학생들이 직접 쓴 기록을 모아 정리한 <strong>비공식</strong> 가이드예요. 운영시간·가격은 바뀔 수 있으니 방문 전에 한 번 더 확인하세요.</p>
+    <p>‘추천’은 그 장소를 적은 학생 수예요.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
