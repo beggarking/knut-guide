@@ -25,7 +25,8 @@
       <div class="search-row">
         <input id="q" type="search" placeholder="이름·메뉴·위치로 검색 (예: 짜장면, 프린터, 999번)" autocomplete="off" aria-label="검색">
         <select id="sort" aria-label="정렬">
-          <option value="rec">추천 많은 순</option>
+          <option value="rec">학생 소개 많은 순</option>
+          <option value="votes">👍 투표 많은 순</option>
           <option value="name">이름 순</option>
           <option value="date">최근 확인 순</option>
         </select>
@@ -35,16 +36,20 @@
   </div>
 
   <main class="wrap">
+    <div class="quick" id="quick"></div>
     <p class="count" id="count"></p>
     <section class="grid" id="list"></section>
-    <p class="empty" id="empty" hidden>찾는 결과가 없어요. 다른 단어로 검색해 보세요.</p>
+    <h2 class="similar-title" id="similarTitle" hidden>비슷한 결과</h2>
+    <section class="grid" id="similar"></section>
+    <p class="empty" id="empty" hidden>비슷한 결과도 없어요. 위의 자주 찾는 검색어를 눌러 보세요.</p>
   </main>
 
   <footer class="wrap footer">
     <p>학생들이 직접 쓴 기록을 모아 정리한 <strong>비공식</strong> 가이드예요. 운영시간·가격은 바뀔 수 있으니 방문 전에 한 번 더 확인하세요.</p>
-    <p>‘추천’은 그 장소를 적은 학생 수예요.</p>
+    <p>‘학생 N명 소개’는 그 장소를 직접 적은 학생 수예요. <span id="voteNote"></span></p>
   </footer>
 
+  <script src="config.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
